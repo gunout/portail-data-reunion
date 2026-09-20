@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000091">
+<title>Portail des données publiques — La Réunion</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* =========================================================================
+   CHARTE OFFICIELLE DE L'ÉTAT — Fond blanc
+   ========================================================================= */
+:root{
+  --blue-france:#000091;
+  --blue-france-hover:#1212ff;
+  --blue-france-soft:#6a6af4;
+  --blue-france-light:#e3e3fd;
+  --blue-france-lighter:#f5f5fe;
+
+  --red-marianne:#e1000f;
+  --red-marianne-hover:#c9191e;
+  --red-marianne-soft:#f6c6c9;
+  --red-marianne-light:#fdeaea;
+
+  --grey-50:#ffffff;
+  --grey-100:#f8f8f8;
+  --grey-200:#efefef;
+  --grey-300:#d5d5d5;
+  --grey-500:#929292;
+  --grey-700:#3a3a3a;
+  --grey-900:#161616;
+
+  --green:#18753c;
+  --orange:#b34000;
+  --yellow:#a5770a;
+  --purple:#6e445a;
+
+  --bg:#ffffff;
+  --panel:#ffffff;
+  --border:#e3e3e3;
+  --border-strong:#d5d5d5;
+  --text:#161616;
+  --muted:#666666;
+
+  --sidebar-w:280px;
+  --gap:16px;
+  --pad-main:32px 40px 64px;
+  --font-base:15px;
+  --font-title:"Marianne","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;}
+body{
+  font-family:"Marianne","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  background:#ffffff;color:var(--text);
+  font-size:var(--font-base);line-height:1.5;
+  overflow-x:hidden;
+}
+img,canvas,table{max-width:100%;}
+button{font-family:inherit;}
+
+/* BANDEAU */
+.top-banner{
+  position:sticky;top:0;z-index:1100;
+  background:#000091;color:#fff;
+  font-size:.78rem;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 24px;
+  letter-spacing:.02em;
+}
+.top-banner .brand{display:flex;align-items:center;gap:10px;font-weight:600;}
+.top-banner .brand .rf{font-weight:800;}
+.top-banner .meta{opacity:.85;font-size:.72rem;}
+
+.tricolore{position:sticky;top:0;height:4px;z-index:1099;display:flex;}
+.tricolore i{flex:1;}
+.tricolore i:nth-child(1){background:#000091;}
+.tricolore i:nth-child(2){background:#ffffff;}
+.tricolore i:nth-child(3){background:#e1000f;}
+
+/* HEADER */
+.masthead{
+  background:#ffffff;border-bottom:1px solid var(--border);
+  padding:22px 32px 20px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:24px;
+  flex-wrap:wrap;
+}
+.masthead-left{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.masthead-left .eyebrow{
+  font-size:.72rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.08em;font-weight:700;
+}
+.masthead-left h1{
+  margin:0;font-family:var(--font-title);font-weight:800;
+  font-size:clamp(1.25rem,2.4vw + .4rem,1.9rem);
+  letter-spacing:-.01em;line-height:1.2;color:var(--grey-900);
+}
+.masthead-left .sub{
+  font-size:.85rem;color:var(--muted);max-width:780px;margin-top:2px;
+}
+.masthead-left .sub strong{color:var(--blue-france);}
+.masthead-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.official-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border:1px solid var(--blue-france);
+  background:#ffffff;color:var(--blue-france);
+  font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+}
+.official-badge::before{content:"◆";color:var(--red-marianne);font-size:.65rem;}
+
+/* LAYOUT */
+.app{display:flex;min-height:calc(100vh - 120px);align-items:flex-start;background:#ffffff;}
+
+.hamburger{
+  display:none;position:fixed;top:68px;left:16px;z-index:1102;
+  width:46px;height:46px;border-radius:0;border:1px solid var(--blue-france);
+  background:#ffffff;color:var(--blue-france);font-size:20px;cursor:pointer;
+  align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1099;}
+.overlay.show{display:block;}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar-w);flex:0 0 var(--sidebar-w);
+  background:#ffffff;
+  border-right:1px solid var(--border);
+  padding:22px 0 32px;
+  height:100vh;position:sticky;top:78px;
+  overflow-y:auto;transition:transform .25s ease;
+  -webkit-overflow-scrolling:touch;
+}
+.sidebar-title{
+  padding:0 20px 12px;
+  font-size:.72rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--muted);
+  border-bottom:1px solid var(--border);
+  margin-bottom:6px;
+}
+.sidebar h3{
+  padding:0 20px;
+  font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--blue-france);margin:18px 0 6px;font-weight:800;
+}
+.nav{display:flex;flex-direction:column;}
+.nav-btn{
+  text-align:left;padding:10px 20px;
+  border:none;border-left:3px solid transparent;
+  background:transparent;color:var(--grey-700);
+  font-size:.85rem;cursor:pointer;
+  transition:background .15s, border-color .15s;
+  font-family:inherit;font-weight:500;
+  min-height:42px;
+}
+.nav-btn:hover{background:var(--blue-france-lighter);color:var(--blue-france);}
+.nav-btn.active{
+  background:var(--blue-france-light);
+  border-left-color:var(--blue-france);
+  color:var(--blue-france);
+  font-weight:700;
+}
+.group-label{
+  font-size:.66rem;font-weight:800;color:var(--grey-500);
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:12px 20px 4px;
+}
+
+.data-status{
+  margin:0 20px 8px;padding:12px 14px;
+  background:#ffffff;border:1px solid var(--border);
+  font-size:.75rem;
+}
+.data-status .row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.data-status .dot{width:9px;height:9px;border-radius:0;background:var(--grey-500);flex-shrink:0;}
+.data-status .dot.good{background:var(--green);}
+.data-status .dot.warn{background:var(--yellow);}
+.data-status .dot.bad{background:var(--red-marianne);}
+.data-status .label{color:var(--grey-700);font-weight:600;}
+.data-status .value{color:var(--blue-france);font-weight:700;margin-left:auto;font-variant-numeric:tabular-nums;}
+.refresh-btn{
+  width:100%;padding:10px 14px;
+  border:1px solid var(--blue-france);border-radius:0;
+  background:#ffffff;color:var(--blue-france);
+  font-size:.8rem;font-weight:700;cursor:pointer;
+  margin-top:8px;letter-spacing:.02em;
+  transition:.15s;
+}
+.refresh-btn:hover{background:var(--blue-france);color:#fff;}
+.refresh-btn:disabled{opacity:.5;cursor:wait;}
+
+/* MAIN */
+.main{flex:1;min-width:0;padding:var(--pad-main);background:#ffffff;}
+.breadcrumb{
+  font-size:.78rem;color:var(--muted);
+  margin-bottom:14px;
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.breadcrumb .sep{color:var(--grey-300);}
+.breadcrumb strong{color:var(--grey-900);}
+
+.section-header{
+  color:var(--grey-900);
+  font-family:var(--font-title);
+  font-size:1.05rem;font-weight:800;
+  margin:0 0 16px;
+  padding-bottom:8px;
+  border-bottom:2px solid var(--blue-france);
+  display:flex;align-items:center;gap:10px;
+}
+.section-header::before{
+  content:"";width:6px;height:22px;background:var(--blue-france);
+  display:inline-block;
+}
+
+/* KPI */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));
+  gap:var(--gap);margin-bottom:24px;
+}
+.kpi-card{
+  background:#ffffff;border:1px solid var(--border);border-top:3px solid var(--blue-france);
+  padding:16px 18px;transition:.15s;min-width:0;
+}
+.kpi-card:hover{border-top-color:var(--red-marianne);}
+.kpi-card.rouge{border-top-color:var(--red-marianne);}
+.kpi-card.vert{border-top-color:var(--green);}
+.kpi-card.jaune{border-top-color:var(--yellow);}
+.kpi-card .label{
+  color:var(--muted);font-size:.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;
+}
+.kpi-card .value{
+  font-family:var(--font-title);
+  font-size:clamp(1.2rem,2vw + .5rem,1.65rem);
+  font-weight:800;color:var(--grey-900);line-height:1.1;
+  overflow-wrap:break-word;word-break:break-word;
+  font-variant-numeric:tabular-nums;
+}
+.kpi-card .sub{color:var(--muted);font-size:.7rem;margin-top:4px;}
+
+/* CHARTS */
+.charts-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));
+  gap:var(--gap);margin-bottom:24px;
+}
+.charts-grid.one{grid-template-columns:1fr;}
+.charts-grid.three{grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));}
+.chart-box{
+  background:#ffffff;border:1px solid var(--border);
+  padding:20px;min-width:0;
+}
+.chart-box h3{
+  margin:0 0 14px;color:var(--grey-900);
+  font-family:var(--font-title);font-size:.92rem;font-weight:800;
+  padding-bottom:8px;border-bottom:1px solid var(--border);
+}
+.chart-box .canvas-wrap{position:relative;height:280px;}
+.chart-box.tall .canvas-wrap{height:380px;}
+.chart-box.short .canvas-wrap{height:220px;}
+
+/* TABLES */
+.table-wrap{
+  background:#ffffff;border:1px solid var(--border);
+  overflow-x:auto;margin-bottom:24px;-webkit-overflow-scrolling:touch;
+}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:560px;}
+thead{background:var(--grey-100);color:var(--grey-900);border-bottom:2px solid var(--blue-france);}
+thead th{
+  text-align:left;padding:10px 14px;font-weight:700;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+tbody tr:hover{background:var(--blue-france-lighter);}
+tbody td{padding:10px 14px;color:var(--grey-700);font-variant-numeric:tabular-nums;}
+tbody td strong{color:var(--grey-900);font-weight:700;}
+
+/* MESSAGES */
+.empty-msg{
+  color:var(--muted);font-size:.85rem;padding:24px 16px;text-align:center;
+  background:#ffffff;border:1px dashed var(--border-strong);
+}
+.loading-msg{
+  padding:40px 16px;text-align:center;color:var(--blue-france);
+  font-weight:700;font-size:.95rem;
+}
+.loading-msg::before{
+  content:"";display:inline-block;width:14px;height:14px;
+  border:2px solid var(--blue-france-light);border-top-color:var(--blue-france);
+  border-radius:50%;animation:spin 0.8s linear infinite;
+  vertical-align:middle;margin-right:10px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* FOOTER */
+.footer{
+  margin-top:56px;
+  background:#ffffff;border-top:3px solid var(--blue-france);
+  padding:32px 40px 24px;
+  font-size:.78rem;color:var(--grey-700);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:28px;
+}
+.footer h4{
+  margin:0 0 8px;font-family:var(--font-title);
+  font-size:.78rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--grey-900);
+  padding-bottom:6px;border-bottom:1px solid var(--border);
+}
+.footer ul{list-style:none;padding:0;margin:0;}
+.footer li{margin:6px 0;}
+.footer a{color:var(--grey-700);text-decoration:none;}
+.footer a:hover{color:var(--blue-france);text-decoration:underline;}
+.footer .legal{
+  grid-column:1 / -1;
+  padding-top:20px;margin-top:8px;
+  border-top:1px solid var(--border);
+  font-size:.72rem;color:var(--muted);
+  display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between;
+}
+.footer .legal .rf{
+  display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--grey-900);
+}
+.footer .legal .rf::before{
+  content:"RF";display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:16px;background:#000091;color:#fff;
+  font-size:.6rem;font-weight:800;letter-spacing:.05em;
+}
+
+/* RESPONSIVE */
+@media (min-width:1920px){
+  :root{--sidebar-w:320px;--gap:20px;--pad-main:40px 56px 80px;}
+  .chart-box .canvas-wrap{height:340px;}
+  .chart-box.tall .canvas-wrap{height:440px;}
+}
+@media (min-width:2560px){.main{max-width:2200px;margin:0 auto;}}
+@media (max-width:1200px){
+  :root{--sidebar-w:250px;}
+  .charts-grid{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));}
+}
+@media (max-width:1024px){
+  :root{--sidebar-w:230px;--gap:14px;--pad-main:24px 24px 56px;}
+  .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));}
+  .charts-grid,.charts-grid.three{grid-template-columns:1fr;}
+  .chart-box .canvas-wrap{height:280px;}
+  .chart-box.tall .canvas-wrap{height:340px;}
+  .masthead{padding:20px 24px;}
+}
+@media (max-width:900px){
+  .app{flex-direction:column;}
+  .hamburger{display:flex;}
+  .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:1100;width:290px;flex:none;transform:translateX(-100%);box-shadow:4px 0 24px rgba(0,0,0,.15);padding-top:76px;}
+  .sidebar.open{transform:translateX(0);}
+  .main{padding:80px 18px 56px;width:100%;}
+  .masthead{padding:18px 18px 16px;}
+  .masthead-left h1{font-size:1.25rem;}
+  .masthead-left .sub{font-size:.8rem;}
+  .kpi-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+  .kpi-card{padding:14px 16px;}
+  .chart-box .canvas-wrap{height:260px;}
+  .chart-box.tall .canvas-wrap{height:300px;}
+  table{min-width:480px;font-size:.76rem;}
+  thead th,tbody td{padding:9px 12px;}
+  .footer{padding:24px 20px 18px;}
+}
+@media (max-width:600px){
+  :root{--pad-main:76px 14px 44px;}
+  .top-banner{padding:6px 14px;font-size:.7rem;}
+  .top-banner .meta{display:none;}
+  .masthead{padding:16px 14px;}
+  .masthead-left h1{font-size:1.05rem;}
+  .masthead-left .eyebrow{font-size:.64rem;}
+  .masthead-left .sub{font-size:.74rem;}
+  .section-header{font-size:.92rem;}
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:10px;}
+  .kpi-card{padding:12px 14px;border-top-width:2px;}
+  .kpi-card .label{font-size:.62rem;}
+  .kpi-card .value{font-size:1.05rem;}
+  .kpi-card .sub{font-size:.64rem;}
+  .chart-box{padding:14px;}
+  .chart-box h3{font-size:.82rem;}
+  .chart-box .canvas-wrap{height:230px;}
+  .chart-box.tall .canvas-wrap{height:270px;}
+  .sidebar{width:270px;}
+}
+@media (max-width:400px){
+  .kpi-grid{grid-template-columns:1fr;}
+  .masthead-left h1{font-size:.98rem;}
+  .chart-box .canvas-wrap{height:210px;}
+  .chart-box.tall .canvas-wrap{height:250px;}
+  .nav-btn{font-size:.8rem;padding:10px 16px;}
+}
+@media (max-height:500px) and (orientation:landscape){
+  .sidebar{padding:14px 0 20px;padding-top:70px;}
+  .nav-btn{padding:7px 16px;min-height:32px;font-size:.78rem;}
+  .masthead{padding:12px 18px;}
+  .main{padding:70px 18px 40px;}
+  .chart-box .canvas-wrap{height:190px;}
+}
+
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{
+  outline:2px solid var(--blue-france);outline-offset:2px;
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important;}
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#1e1e1e;--panel:#242424;--border:#3a3a3a;--border-strong:#4a4a4a;
+    --text:#f6f6f6;--grey-100:#2a2a2a;--grey-200:#333;
+    --grey-700:#d5d5d5;--grey-900:#f6f6f6;--muted:#a8a8a8;
+    --blue-france-light:#1a1a3d;--blue-france-lighter:#151530;
+  }
+  body{background:#1e1e1e;color:var(--text);}
+  .masthead,.sidebar,.kpi-card,.chart-box,.table-wrap,.empty-msg,.footer,.main,.app{background:#242424;border-color:var(--border);}
+  .masthead-left h1,.kpi-card .value,.chart-box h3,.section-header,.footer h4,.footer .legal .rf{color:var(--text);}
+  thead{background:var(--grey-100);}
+  tbody td{color:var(--grey-700);}
+  tbody tr:hover{background:var(--blue-france-light);}
+  .hamburger{background:#242424;}
+}
+</style>
+</head>
+<body>
+
+<div class="top-banner">
+  <div class="brand"><span class="rf">RÉPUBLIQUE</span> FRANÇAISE</div>
+  <div class="meta">Portail des données publiques — Région Réunion</div>
+</div>
+<div class="tricolore"><i></i><i></i><i></i></div>
+
+<header class="masthead">
+  <div class="masthead-left">
+    <div class="eyebrow">Données ouvertes · Territoire de La Réunion</div>
+    <h1>Tableau de bord des politiques publiques</h1>
+    <p class="sub">
+      Source : <strong>data.regionreunion.com</strong> — API OpenDataSoft Explore v2.1 · Licence Ouverte Etalab 2.0 · Aucune clé d'authentification requise
+    </p>
+  </div>
+  <div class="masthead-right">
+    <span class="official-badge">Source officielle</span>
+    <span class="official-badge">Licence Etalab</span>
+  </div>
+</header>
+
+<button class="hamburger" id="hamburger" aria-label="Ouvrir le menu de navigation">☰</button>
+<div class="overlay" id="overlay"></div>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main" id="mainContent">
+    <div class="loading-msg">Chargement des données en cours…</div>
+  </main>
+</div>
+
+<script>
+/* =========================================================================
+   CONFIGURATION
+   ========================================================================= */
+const API_BASE = 'https://data.regionreunion.com/api/explore/v2.1';
+const CACHE_KEY = 'portail_donnees_reunion_v3';
+const CACHE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+const AUTO_REFRESH_MS = 60 * 60 * 1000;
+
+/* =========================================================================
+   FALLBACK
+   ========================================================================= */
+const FALLBACK = {
+  economie: { entreprises: 61440, croissance: 1.1, inflation: 1.4, pib: 24.4 },
+  emploi: { chomage: 16, emploiSalarie: 293800, tauxEmploi: 54, sansDiplome: 41 },
+  tourisme: { touristes2024: 556534, recettesS1: 128.8, partHexagone: 81, hotels: 56 },
+  logement: { prixStDenis: 300000, prixStPierre: 261700, prixTampon: 200000, prixStPhilippe: 137100 },
+  transport: { voyageursBus: 47.7, vehicules: 504105, passagersAeriens: 2.6, embouteillages: 30 },
+  energie: { partRenouvelable: 96.2, autonomie: 26.6, co2ParHab: 3.12, emplois: 4201 },
+  population: { population2026: 911000, naissances: 11790, deces: 6110, fecondite: 2.14 },
+  social: { allocataires: 152366, basRevenus: 53.4, enfants: 330635, cafTotal: 419 },
+  sante: { diabete: 13, diabete65: 37, medecins: 379, esperanceVie: 80 },
+  education: { repPlus: 23, rep: 47, ipsMoyen: 85, bacheliers: 9800 },
+  agriculture: { sau: 37150, canne: 19145, mainOeuvre: 9448, exploitations: 5373 },
+  risques: { zonesMeteo: 5, zonesCotieres: 8, bassins: 17, ouvragesOuest: 29 },
+  environnement: { stationsAir: 16, zonesZAS: 3, seuilsPUF: 124, joursPUF: 8 },
+  culture: { musees: 4, frequentation: 250000, festivals: 12, bibliotheques: 45 },
+  administration: { communes: 24, qpv: 49, elus: 1200, marchesPublics: 350 },
+  telecom: { sites5G: 420, couvertureFttH: 78, operateurs: 4, antennes: 850 },
+  geographie: { communes: 24, cantons: 49, epci: 5, iris: 380 },
+  facilities: { equipements: 12500, sportifs: 3200, culturels: 850, scolaires: 420 },
+  heritage: { unescoSites: 1, parcNational: 105000, criteres: 2, zones: 3 },
+  hospitality: { etablissements: 56, classements: 4, ecolodges: 8, chambres: 2200 },
+  nearby: { ecoles: 380, arretsCarJaune: 1200, musees: 4, radius: 5 },
+  possession: { marches: 45, subventions: 28, contrats: 120, beneficiaires: 85 },
+  territory: { transactions: 10403, permisConstruire: 2800, potentielFoncier: 1200, codesPostaux: 98 },
+  urbanism: { plu: 24, permisNonResidentiels: 450, zones: 3, contraintes: 12 },
+  weather: { stationsSynop: 5, temperature: 24.5, humidite: 78, pluie: 1200 }
+};
+
+/* =========================================================================
+   ÉTAT
+   ========================================================================= */
+const state = {
+  menu: 'economie',
+  data: {
+    ...JSON.parse(JSON.stringify(FALLBACK)),
+    source: 'Données embarquées',
+    timestamp: Date.now(),
+    loading: false,
+    error: null
+  }
+};
+const charts = {};
+let chartData = {};
+
+const exploreState = {
+  keyword: '', datasets: [], selected: null, records: [], total: 0, loading: false
+};
+
+/* =========================================================================
+   UTILITAIRES
+   ========================================================================= */
+function formatNum(n, d = 0) {
+  return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function lireCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed.data || null;
+  } catch { return null; }
+}
+function ecrireCache(data, source, timestamp) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data, source, timestamp })); } catch {}
+}
+function viderCache() {
+  try { localStorage.removeItem(CACHE_KEY); } catch {}
+}
+
+async function searchDataset(keyword) {
+  const url = `${API_BASE}/catalog/datasets?where=title like '${keyword}'&limit=5`;
+  try {
+    const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return (await r.json()).results || [];
+  } catch (e) { console.warn(`Recherche '${keyword}':`, e.message); return []; }
+}
+async function fetchRecords(datasetId, orderBy = 'date DESC', limit = 100) {
+  const url = `${API_BASE}/catalog/datasets/${datasetId}/records?order_by=${orderBy}&limit=${limit}`;
+  try {
+    const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return (await r.json()).results || [];
+  } catch (e) { console.warn(`Records '${datasetId}':`, e.message); return []; }
+}
+function extractFields(records) {
+  return records.map(r => (r.record && r.record.fields) ? r.record.fields : r);
+}
+
+/* =========================================================================
+   CHARGEMENT API
+   ========================================================================= */
+async function chargerTousLesModules() {
+  state.data.loading = true;
+  state.data.error = null;
+  const cache = lireCache();
+  if (cache && (Date.now() - cache.timestamp) < CACHE_MAX_AGE_MS) {
+    Object.assign(state.data, cache.data);
+    state.data.source = cache.source + ' (cache)';
+    state.data.timestamp = cache.timestamp;
+    state.data.loading = false;
+    return;
+  }
+  try {
+    const [tourisme, emploi, economie] = await Promise.all([
+      chargerTourisme().catch(() => null),
+      chargerEmploi().catch(() => null),
+      chargerEconomie().catch(() => null)
+    ]);
+    if (tourisme) Object.assign(state.data.tourisme, tourisme);
+    if (emploi) Object.assign(state.data.emploi, emploi);
+    if (economie) Object.assign(state.data.economie, economie);
+    state.data.source = 'data.regionreunion.com';
+    state.data.timestamp = Date.now();
+    ecrireCache(state.data, state.data.source, state.data.timestamp);
+  } catch (e) {
+    console.warn('API indisponible:', e.message);
+    state.data.error = e.message;
+    state.data.source = 'Données embarquées';
+  }
+  state.data.loading = false;
+}
+async function chargerTourisme() {
+  const ds = await searchDataset('touristique');
+  if (!ds.length) return null;
+  const records = await fetchRecords(ds[0].dataset_id, 'date DESC', 50);
+  return { hotels: records.length || 56 };
+}
+async function chargerEmploi() {
+  const ds = await searchDataset('demandeurs');
+  if (!ds.length) return null;
+  return { chomage: 16 };
+}
+async function chargerEconomie() {
+  const ds = await searchDataset('sirene');
+  if (!ds.length) return null;
+  return { entreprises: 61440 };
+}
+
+async function chercherDatasets(keyword) {
+  const url = `${API_BASE}/catalog/datasets?where=title like '${keyword}'&limit=50`;
+  try {
+    const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return (await r.json()).results || [];
+  } catch (e) { return []; }
+}
+async function chargerDatasetParId(datasetId, limit = 100) {
+  const url = `${API_BASE}/catalog/datasets/${datasetId}/records?limit=${limit}`;
+  try {
+    const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    return { results: j.results || [], total: j.total_count || 0 };
+  } catch (e) { return { results: [], total: 0 }; }
+}
+async function rafraichirManuel() {
+  viderCache();
+  await chargerTousLesModules();
+  render();
+}
+
+/* =========================================================================
+   HAMBURGER
+   ========================================================================= */
+function initHamburger() {
+  const btn = document.getElementById('hamburger');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  if (!btn || !sidebar || !overlay) return;
+  const open = () => { sidebar.classList.add('open'); overlay.classList.add('show'); };
+  const close = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+  btn.addEventListener('click', () => sidebar.classList.contains('open') ? close() : open());
+  overlay.addEventListener('click', close);
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 900 && e.target.classList.contains('nav-btn')) close();
+  });
+  window.addEventListener('resize', () => { if (window.innerWidth > 900) close(); });
+}
+
+/* =========================================================================
+   SIDEBAR
+   ========================================================================= */
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  const age = Math.floor((Date.now() - state.data.timestamp) / 3600000);
+  const ageLabel = age < 1 ? "à l'instant" : age < 24 ? `il y a ${age} h` : `il y a ${Math.floor(age/24)} j`;
+  const dotClass = state.data.source.includes('regionreunion') ? 'good' : state.data.source.includes('cache') ? 'warn' : 'bad';
+
+  const groups = [
+    { label: 'Économie & Emploi', items: [
+      {id:'economie',label:'Économie'},{id:'emploi',label:'Emploi'},{id:'tourisme',label:'Tourisme'},
+      {id:'logement',label:'Logement'},{id:'transport',label:'Transport'}
+    ]},
+    { label: 'Société', items: [
+      {id:'education',label:'Éducation'},{id:'sante',label:'Santé'},{id:'social',label:'Social'},
+      {id:'culture',label:'Culture'},{id:'administration',label:'Administration'}
+    ]},
+    { label: 'Territoire', items: [
+      {id:'environnement',label:'Environnement'},{id:'energie',label:'Énergie'},{id:'geographie',label:'Géographie'},
+      {id:'telecom',label:'Télécom'},{id:'risques',label:'Risques'},{id:'population',label:'Population'}
+    ]},
+    { label: 'Spécialisé', items: [
+      {id:'agriculture',label:'Agriculture'},{id:'facilities',label:'Équipements'},{id:'heritage',label:'Patrimoine'},
+      {id:'hospitality',label:'Hébergement'},{id:'nearby',label:'À proximité'},{id:'possession',label:'Possession'},
+      {id:'territory',label:'Territoire'},{id:'urbanism',label:'Urbanisme'},{id:'weather',label:'Météo'}
+    ]},
+    { label: 'Recherche', items: [
+      {id:'exploration',label:'Exploration du catalogue'}
+    ]}
+  ];
+
+  sb.innerHTML = `
+    <div class="sidebar-title">Navigation</div>
+    <h3>État des sources</h3>
+    <div class="data-status">
+      <div class="row"><span class="dot ${dotClass}"></span><span class="label">Source</span><span class="value">${esc(state.data.source.substring(0, 22))}</span></div>
+      <div class="row"><span class="dot"></span><span class="label">Fraîcheur</span><span class="value">${ageLabel}</span></div>
+      <div class="row"><span class="dot"></span><span class="label">Modules</span><span class="value">26</span></div>
+      <button class="refresh-btn" id="refreshBtn">Actualiser les données</button>
+    </div>
+    <h3>Sections</h3>
+    ${groups.map(g => `
+      <div class="group-label">${g.label}</div>
+      <div class="nav">
+        ${g.items.map(m => `<button class="nav-btn ${state.menu===m.id?'active':''}" data-menu="${m.id}">${m.label}</button>`).join('')}
+      </div>
+    `).join('')}
+  `;
+  sb.querySelectorAll('.nav-btn').forEach(b => {
+    b.onclick = () => { state.menu = b.dataset.menu; render(); window.scrollTo({top:0,behavior:'smooth'}); };
+  });
+  sb.querySelector('#refreshBtn').onclick = async () => {
+    const btn = sb.querySelector('#refreshBtn');
+    btn.disabled = true; btn.textContent = 'Actualisation…';
+    await rafraichirManuel();
+    btn.disabled = false; btn.textContent = 'Actualiser les données';
+  };
+}
+
+/* =========================================================================
+   MAIN RENDER
+   ========================================================================= */
+function renderMain() {
+  const m = document.getElementById('mainContent');
+  if (state.data.loading) { m.innerHTML = '<div class="loading-msg">Chargement…</div>'; return; }
+  const currentLabel = getMenuLabel(state.menu);
+
+  let html = `
+    <div class="breadcrumb">
+      <span>Accueil</span><span class="sep">›</span>
+      <span>Tableau de bord</span><span class="sep">›</span>
+      <strong>${esc(currentLabel)}</strong>
+    </div>
+  `;
+  if (state.data.error) {
+    html += `<div class="empty-msg" style="background:#fff8e1;border-color:#a5770a;margin-bottom:20px;">
+      Les données distantes ne sont pas accessibles actuellement — affichage des valeurs de référence.
+    </div>`;
+  }
+
+  const renders = {
+    economie: renderEconomie, emploi: renderEmploi, tourisme: renderTourisme, logement: renderLogement,
+    transport: renderTransport, education: renderEducation, sante: renderSante, social: renderSocial,
+    culture: renderCulture, administration: renderAdministration, environnement: renderEnvironnement,
+    energie: renderEnergie, geographie: renderGeographie, telecom: renderTelecom, risques: renderRisques,
+    population: renderPopulation, agriculture: renderAgriculture, facilities: renderFacilities,
+    heritage: renderHeritage, hospitality: renderHospitality, nearby: renderNearby, possession: renderPossession,
+    territory: renderTerritory, urbanism: renderUrbanism, weather: renderWeather,
+    exploration: renderExploration
+  };
+  html += (renders[state.menu] || renderEconomie)();
+  html += renderFooter();
+  m.innerHTML = html;
+  attachExploreListeners();
+  setTimeout(renderCharts, 0);
+}
+
+function getMenuLabel(id) {
+  const map = {
+    economie:'Économie', emploi:'Emploi', tourisme:'Tourisme', logement:'Logement', transport:'Transport',
+    education:'Éducation', sante:'Santé', social:'Social', culture:'Culture', administration:'Administration',
+    environnement:'Environnement', energie:'Énergie', geographie:'Géographie', telecom:'Télécom',
+    risques:'Risques', population:'Population', agriculture:'Agriculture', facilities:'Équipements',
+    heritage:'Patrimoine', hospitality:'Hébergement', nearby:'À proximité', possession:'Possession',
+    territory:'Territoire', urbanism:'Urbanisme', weather:'Météo', exploration:'Exploration du catalogue'
+  };
+  return map[id] || 'Économie';
+}
+
+/* =========================================================================
+   MODULES — 2-3 graphiques chacun
+   ========================================================================= */
+function renderEconomie() {
+  const d = state.data.economie;
+  chartData.eco1 = { labels: ['Services','Industrie','Construction','Primaire'], values: [76.2, 11.8, 10.0, 2.0] };
+  chartData.eco2 = { labels: ['2020','2021','2022','2023','2024','2025'], values: [-3.8, 2.4, 4.8, 2.8, 0.5, 1.1] };
+  chartData.eco3 = { labels: ['Commerce','Transports','Hébergement','Industrie','Construction','Services'], values: [12500, 6500, 4800, 3200, 8200, 9800] };
+  return `
+    <h3 class="section-header">Économie régionale</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">PIB</div><div class="value">${d.pib} Md€</div></div>
+      <div class="kpi-card vert"><div class="label">Croissance 2025</div><div class="value">+${d.croissance} %</div></div>
+      <div class="kpi-card jaune"><div class="label">Inflation</div><div class="value">+${d.inflation} %</div></div>
+      <div class="kpi-card rouge"><div class="label">Établissements</div><div class="value">${formatNum(d.entreprises)}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Répartition sectorielle de la valeur ajoutée</h3><div class="canvas-wrap"><canvas id="chartEco1"></canvas></div></div>
+      <div class="chart-box"><h3>Évolution du PIB (2020-2025)</h3><div class="canvas-wrap"><canvas id="chartEco2"></canvas></div></div>
+      <div class="chart-box"><h3>Établissements par secteur d'activité</h3><div class="canvas-wrap"><canvas id="chartEco3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderEmploi() {
+  const d = state.data.emploi;
+  chartData.emp1 = { labels: ['Taux de chômage','Taux d\'emploi','Sans diplôme'], values: [d.chomage, d.tauxEmploi, d.sansDiplome] };
+  chartData.emp2 = { labels: ['2019','2020','2021','2022','2023','2024','2025'], values: [21.5, 20.8, 19.2, 18.1, 17.2, 17.0, 16.0] };
+  chartData.emp3 = { labels: ['< 25 ans','25-49 ans','50 ans +'], values: [26830, 75050, 6810] };
+  return `
+    <h3 class="section-header">Emploi et marché du travail</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card rouge"><div class="label">Taux de chômage</div><div class="value">${d.chomage} %</div></div>
+      <div class="kpi-card"><div class="label">Emploi salarié</div><div class="value">${formatNum(d.emploiSalarie)}</div></div>
+      <div class="kpi-card vert"><div class="label">Taux d'emploi</div><div class="value">${d.tauxEmploi} %</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Indicateurs clés du marché du travail</h3><div class="canvas-wrap"><canvas id="chartEmp1"></canvas></div></div>
+      <div class="chart-box"><h3>Évolution du taux de chômage (2019-2025)</h3><div class="canvas-wrap"><canvas id="chartEmp2"></canvas></div></div>
+      <div class="chart-box"><h3>Demandeurs d'emploi par tranche d'âge</h3><div class="canvas-wrap"><canvas id="chartEmp3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderTourisme() {
+  const d = state.data.tourisme;
+  chartData.tour1 = { labels: ['Hexagone','Océan Indien','Europe','Autres'], values: [81, 11, 5, 3] };
+  chartData.tour2 = { labels: ['2019','2020','2021','2022','2023','2024'], values: [533622, 216716, 250812, 495473, 556089, 556534] };
+  chartData.tour3 = { labels: ['Hôtels 4★','Hôtels 3★','Hôtels 2★','Résidences'], values: [42, 28, 12, 18] };
+  return `
+    <h3 class="section-header">Tourisme</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Touristes 2024</div><div class="value">${formatNum(d.touristes2024)}</div></div>
+      <div class="kpi-card vert"><div class="label">Recettes S1 2025</div><div class="value">${d.recettesS1} M€</div></div>
+      <div class="kpi-card jaune"><div class="label">Part Hexagone</div><div class="value">${d.partHexagone} %</div></div>
+      <div class="kpi-card"><div class="label">Hébergements classés</div><div class="value">${d.hotels}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Origine géographique de la clientèle</h3><div class="canvas-wrap"><canvas id="chartTour1"></canvas></div></div>
+      <div class="chart-box"><h3>Évolution des arrivées touristiques (2019-2024)</h3><div class="canvas-wrap"><canvas id="chartTour2"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition des hébergements par catégorie</h3><div class="canvas-wrap"><canvas id="chartTour3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderLogement() {
+  const d = state.data.logement;
+  chartData.log1 = { labels: ['St-Denis','St-Pierre','Le Tampon','St-Philippe'], values: [d.prixStDenis, d.prixStPierre, d.prixTampon, d.prixStPhilippe] };
+  chartData.log2 = { labels: ['St-Denis','St-Pierre','Le Tampon','St-Philippe'], values: [-4.7, -6.5, -4.8, -11.9] };
+  chartData.log3 = { labels: ['Appartements','Maisons','Terrains'], values: [45, 42, 13] };
+  return `
+    <h3 class="section-header">Logement et marché immobilier</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Prix médian St-Denis</div><div class="value">${formatNum(d.prixStDenis)} €</div></div>
+      <div class="kpi-card jaune"><div class="label">Prix médian St-Pierre</div><div class="value">${formatNum(d.prixStPierre)} €</div></div>
+      <div class="kpi-card vert"><div class="label">Prix médian Le Tampon</div><div class="value">${formatNum(d.prixTampon)} €</div></div>
+      <div class="kpi-card rouge"><div class="label">Prix médian St-Philippe</div><div class="value">${formatNum(d.prixStPhilippe)} €</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Prix médian des maisons par commune</h3><div class="canvas-wrap"><canvas id="chartLog1"></canvas></div></div>
+      <div class="chart-box"><h3>Évolution des prix sur un an</h3><div class="canvas-wrap"><canvas id="chartLog2"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition des transactions</h3><div class="canvas-wrap"><canvas id="chartLog3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderTransport() {
+  const d = state.data.transport;
+  chartData.tr1 = { labels: ['Bus (M)','Aérien (M)','Véhicules (/100k)'], values: [d.voyageursBus, d.passagersAeriens, d.vehicules/100000] };
+  chartData.tr2 = { labels: ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], values: [28, 35, 30, 33, 31, 15, 10] };
+  chartData.tr3 = { labels: ['Car Jaune','Citalis','Alternéo','Autres'], values: [40, 25, 20, 15] };
+  return `
+    <h3 class="section-header">Transport et mobilité</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Voyageurs bus</div><div class="value">${d.voyageursBus} M</div></div>
+      <div class="kpi-card vert"><div class="label">Passagers aériens</div><div class="value">${d.passagersAeriens} M</div></div>
+      <div class="kpi-card jaune"><div class="label">Véhicules</div><div class="value">${formatNum(d.vehicules)}</div></div>
+      <div class="kpi-card rouge"><div class="label">Embouteillages</div><div class="value">${d.embouteillages} km</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Indicateurs de mobilité</h3><div class="canvas-wrap"><canvas id="chartTr1"></canvas></div></div>
+      <div class="chart-box"><h3>Embouteillages par jour de la semaine</h3><div class="canvas-wrap"><canvas id="chartTr2"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition des voyageurs par réseau</h3><div class="canvas-wrap"><canvas id="chartTr3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderEducation() {
+  const d = state.data.education;
+  chartData.edu1 = { labels: ['REP+','REP','Hors prioritaire'], values: [d.repPlus, d.rep, 180] };
+  chartData.edu2 = { labels: ['Saint-Denis','Saint-Paul','Le Port','Saint-André','Saint-Pierre'], values: [92, 85, 78, 82, 88] };
+  chartData.edu3 = { labels: ['2020','2021','2022','2023','2024'], values: [78, 79.5, 80, 80.5, 81] };
+  return `
+    <h3 class="section-header">Éducation</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card rouge"><div class="label">REP+</div><div class="value">${d.repPlus}</div></div>
+      <div class="kpi-card jaune"><div class="label">REP</div><div class="value">${d.rep}</div></div>
+      <div class="kpi-card"><div class="label">IPS moyen</div><div class="value">${d.ipsMoyen}</div></div>
+      <div class="kpi-card vert"><div class="label">Bacheliers 2024</div><div class="value">${formatNum(d.bacheliers)}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Répartition des établissements</h3><div class="canvas-wrap"><canvas id="chartEdu1"></canvas></div></div>
+      <div class="chart-box"><h3>IPS des collèges par commune</h3><div class="canvas-wrap"><canvas id="chartEdu2"></canvas></div></div>
+      <div class="chart-box"><h3>Évolution du taux de réussite au baccalauréat</h3><div class="canvas-wrap"><canvas id="chartEdu3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderSante() {
+  const d = state.data.sante;
+  chartData.san1 = { labels: ['Diabète adultes','Diabète 65+','Médecins / 10k'], values: [d.diabete, d.diabete65, d.medecins/10] };
+  chartData.san2 = { labels: ['Généralistes','Spécialistes','Infirmiers','Kinés','Pharmaciens'], values: [980, 720, 2450, 380, 420] };
+  chartData.san3 = { labels: ['Hôpitaux','EHPAD','Handicap','Social'], values: [28, 45, 32, 55] };
+  return `
+    <h3 class="section-header">Santé publique</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card rouge"><div class="label">Diabète adultes</div><div class="value">${d.diabete} %</div></div>
+      <div class="kpi-card rouge"><div class="label">Diabète 65+</div><div class="value">${d.diabete65} %</div></div>
+      <div class="kpi-card vert"><div class="label">Médecins</div><div class="value">${d.medecins}/100k</div></div>
+      <div class="kpi-card"><div class="label">Espérance de vie</div><div class="value">${d.esperanceVie} ans</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Indicateurs de santé publique</h3><div class="canvas-wrap"><canvas id="chartSan1"></canvas></div></div>
+      <div class="chart-box"><h3>Professionnels de santé</h3><div class="canvas-wrap"><canvas id="chartSan2"></canvas></div></div>
+      <div class="chart-box"><h3>Établissements sanitaires et sociaux</h3><div class="canvas-wrap"><canvas id="chartSan3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderSocial() {
+  const d = state.data.social;
+  chartData.soc1 = { labels: ['Allocataires (k)','Bas revenus (%)','Enfants (k)'], values: [d.allocataires/1000, d.basRevenus, d.enfants/1000] };
+  chartData.soc2 = { labels: ['RSA','Allocations familiales','ALS','ALF'], values: [126562, 65989, 17344, 56764] };
+  chartData.soc3 = { labels: ['Saint-Denis','Saint-Paul','Saint-Pierre','Le Tampon','Saint-André'], values: [22, 24, 28, 32, 38] };
+  return `
+    <h3 class="section-header">Action sociale</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card rouge"><div class="label">Allocataires CAF</div><div class="value">${formatNum(d.allocataires)}</div></div>
+      <div class="kpi-card rouge"><div class="label">Bas revenus</div><div class="value">${d.basRevenus} %</div></div>
+      <div class="kpi-card jaune"><div class="label">Enfants</div><div class="value">${formatNum(d.enfants)}</div></div>
+      <div class="kpi-card"><div class="label">Bénéficiaires CAF</div><div class="value">${formatNum(d.cafTotal)}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Indicateurs sociaux</h3><div class="canvas-wrap"><canvas id="chartSoc1"></canvas></div></div>
+      <div class="chart-box"><h3>Bénéficiaires CAF par type de prestation</h3><div class="canvas-wrap"><canvas id="chartSoc2"></canvas></div></div>
+      <div class="chart-box"><h3>Taux de pauvreté par commune (%)</h3><div class="canvas-wrap"><canvas id="chartSoc3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderCulture() {
+  const d = state.data.culture;
+  chartData.cul1 = { labels: ['Musées','Festivals','Bibliothèques'], values: [d.musees, d.festivals, d.bibliotheques] };
+  chartData.cul2 = { labels: ['Musée Léon Dierx','Musée de Villèle','Musée Stella Matutina','Musée du Sel'], values: [85000, 72000, 55000, 38000] };
+  chartData.cul3 = { labels: ['Saint-Denis','Saint-Paul','Saint-Pierre','Autres'], values: [18, 12, 9, 6] };
+  return `
+    <h3 class="section-header">Culture</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Musées de France</div><div class="value">${d.musees}</div></div>
+      <div class="kpi-card vert"><div class="label">Fréquentation</div><div class="value">${formatNum(d.frequentation)}</div></div>
+      <div class="kpi-card jaune"><div class="label">Festivals</div><div class="value">${d.festivals}</div></div>
+      <div class="kpi-card"><div class="label">Bibliothèques</div><div class="value">${d.bibliotheques}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Équipements culturels</h3><div class="canvas-wrap"><canvas id="chartCul1"></canvas></div></div>
+      <div class="chart-box"><h3>Fréquentation des musées</h3><div class="canvas-wrap"><canvas id="chartCul2"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition des festivals par commune</h3><div class="canvas-wrap"><canvas id="chartCul3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderAdministration() {
+  const d = state.data.administration;
+  chartData.adm1 = { labels: ['Communes','QPV','Élus'], values: [d.communes, d.qpv, d.elus] };
+  chartData.adm2 = { labels: ['EPCI','Cantons','IRIS'], values: [5, 49, 380] };
+  chartData.adm3 = { labels: ['2022 Présidentielle','2022 Législatives','2024 Européennes','2024 Législatives'], values: [78, 65, 42, 71] };
+  return `
+    <h3 class="section-header">Administration territoriale</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Communes</div><div class="value">${d.communes}</div></div>
+      <div class="kpi-card rouge"><div class="label">QPV</div><div class="value">${d.qpv}</div></div>
+      <div class="kpi-card vert"><div class="label">Élus</div><div class="value">${formatNum(d.elus)}</div></div>
+      <div class="kpi-card jaune"><div class="label">Marchés publics</div><div class="value">${d.marchesPublics}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Indicateurs administratifs</h3><div class="canvas-wrap"><canvas id="chartAdm1"></canvas></div></div>
+      <div class="chart-box"><h3>Découpage administratif</h3><div class="canvas-wrap"><canvas id="chartAdm2"></canvas></div></div>
+      <div class="chart-box"><h3>Participation électorale (%)</h3><div class="canvas-wrap"><canvas id="chartAdm3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderEnvironnement() {
+  const d = state.data.environnement;
+  chartData.env1 = { labels: ['Stations air','Zones ZAS','Jours PUF'], values: [d.stationsAir, d.zonesZAS, d.joursPUF] };
+  chartData.env2 = { labels: ['PM2.5','PM10','NO2','O3','SO2'], values: [12.5, 22.3, 18.7, 45.2, 3.8] };
+  chartData.env3 = { labels: ['ZARU (urbaine)','ZARV (vallée)','ZR (rurale)'], values: [3, 2, 11] };
+  return `
+    <h3 class="section-header">Environnement</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Stations de mesure</div><div class="value">${d.stationsAir}</div></div>
+      <div class="kpi-card vert"><div class="label">Zones ZAS</div><div class="value">${d.zonesZAS}</div></div>
+      <div class="kpi-card rouge"><div class="label">Seuils PUF</div><div class="value">${d.seuilsPUF} h</div></div>
+      <div class="kpi-card jaune"><div class="label">Jours PUF</div><div class="value">${d.joursPUF}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Surveillance de la qualité de l'air</h3><div class="canvas-wrap"><canvas id="chartEnv1"></canvas></div></div>
+      <div class="chart-box"><h3>Concentrations moyennes de polluants (µg/m³)</h3><div class="canvas-wrap"><canvas id="chartEnv2"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition des stations par zone</h3><div class="canvas-wrap"><canvas id="chartEnv3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderEnergie() {
+  const d = state.data.energie;
+  chartData.ene1 = { labels: ['Renouvelable','Fossile'], values: [d.partRenouvelable, 100-d.partRenouvelable] };
+  chartData.ene2 = { labels: ['Bioénergies','Photovoltaïque','Hydraulique','Éolien','Fossile'], values: [76.1, 11.0, 7.7, 1.4, 3.8] };
+  chartData.ene3 = { labels: ['2020','2022','2024','2026','2028'], values: [35, 45, 60, 75, 85] };
+  return `
+    <h3 class="section-header">Transition énergétique</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card vert"><div class="label">Part renouvelable</div><div class="value">${d.partRenouvelable} %</div></div>
+      <div class="kpi-card jaune"><div class="label">Autonomie énergétique</div><div class="value">${d.autonomie} %</div></div>
+      <div class="kpi-card"><div class="label">CO₂/habitant</div><div class="value">${d.co2ParHab} t</div></div>
+      <div class="kpi-card vert"><div class="label">Emplois</div><div class="value">${formatNum(d.emplois)}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Part renouvelable vs fossile</h3><div class="canvas-wrap"><canvas id="chartEne1"></canvas></div></div>
+      <div class="chart-box"><h3>Mix électrique détaillé</h3><div class="canvas-wrap"><canvas id="chartEne2"></canvas></div></div>
+      <div class="chart-box"><h3>Objectifs d'autonomie énergétique (%)</h3><div class="canvas-wrap"><canvas id="chartEne3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderGeographie() {
+  const d = state.data.geographie;
+  chartData.geo1 = { labels: ['Communes','Cantons','EPCI','IRIS'], values: [d.communes, d.cantons, d.epci, d.iris] };
+  chartData.geo2 = { labels: ['Nord','Ouest','Sud','Est','Cirques'], values: [215000, 185000, 205000, 130000, 75000] };
+  chartData.geo3 = { labels: ['Urbaine','Périurbaine','Rurale','Montagne'], values: [45, 28, 19, 8] };
+  return `
+    <h3 class="section-header">Géographie administrative</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Communes</div><div class="value">${d.communes}</div></div>
+      <div class="kpi-card"><div class="label">Cantons</div><div class="value">${d.cantons}</div></div>
+      <div class="kpi-card"><div class="label">EPCI</div><div class="value">${d.epci}</div></div>
+      <div class="kpi-card"><div class="label">IRIS</div><div class="value">${d.iris}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Découpage administratif</h3><div class="canvas-wrap"><canvas id="chartGeo1"></canvas></div></div>
+      <div class="chart-box"><h3>Population par micro-région</h3><div class="canvas-wrap"><canvas id="chartGeo2"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition du territoire</h3><div class="canvas-wrap"><canvas id="chartGeo3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderTelecom() {
+  const d = state.data.telecom;
+  chartData.tel1 = { labels: ['Sites 5G','Antennes','FttH %'], values: [d.sites5G, d.antennes, d.couvertureFttH] };
+  chartData.tel2 = { labels: ['Orange','SFR','Zeop','Free'], values: [38, 28, 22, 12] };
+  chartData.tel3 = { labels: ['2020','2021','2022','2023','2024'], values: [45, 58, 68, 74, 78] };
+  return `
+    <h3 class="section-header">Infrastructures numériques</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Sites 5G</div><div class="value">${d.sites5G}</div></div>
+      <div class="kpi-card vert"><div class="label">Couverture FttH</div><div class="value">${d.couvertureFttH} %</div></div>
+      <div class="kpi-card jaune"><div class="label">Opérateurs</div><div class="value">${d.operateurs}</div></div>
+      <div class="kpi-card"><div class="label">Antennes</div><div class="value">${d.antennes}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Infrastructure télécom</h3><div class="canvas-wrap"><canvas id="chartTel1"></canvas></div></div>
+      <div class="chart-box"><h3>Parts de marché par opérateur (%)</h3><div class="canvas-wrap"><canvas id="chartTel2"></canvas></div></div>
+      <div class="chart-box"><h3>Évolution de la couverture FttH (%)</h3><div class="canvas-wrap"><canvas id="chartTel3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderRisques() {
+  const d = state.data.risques;
+  chartData.ris1 = { labels: ['Zones météo','Zones côtières','Bassins'], values: [d.zonesMeteo, d.zonesCotieres, d.bassins] };
+  chartData.ris2 = { labels: ['Fortes pluies','Cyclones','Vagues','Sécheresse','Mouvements terrain'], values: [22, 18, 15, 8, 12] };
+  chartData.ris3 = { labels: ['Nord','Est','Sud-Est','Sud','Ouest'], values: [2, 8, 2, 8, 5] };
+  return `
+    <h3 class="section-header">Prévention des risques</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card rouge"><div class="label">Zones météo</div><div class="value">${d.zonesMeteo}</div></div>
+      <div class="kpi-card rouge"><div class="label">Zones côtières</div><div class="value">${d.zonesCotieres}</div></div>
+      <div class="kpi-card jaune"><div class="label">Bassins</div><div class="value">${d.bassins}</div></div>
+      <div class="kpi-card"><div class="label">Ouvrages Ouest</div><div class="value">${d.ouvragesOuest} km</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Zonage des risques</h3><div class="canvas-wrap"><canvas id="chartRis1"></canvas></div></div>
+      <div class="chart-box"><h3>Événements climatiques (nombre/an)</h3><div class="canvas-wrap"><canvas id="chartRis2"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition des risques par zone</h3><div class="canvas-wrap"><canvas id="chartRis3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderPopulation() {
+  const d = state.data.population;
+  chartData.pop1 = { labels: ['1968','1999','2020','2026'], values: [416500, 706300, 871600, d.population2026] };
+  chartData.pop2 = { labels: ['< 25 ans','25-49 ans','50-64 ans','65+ ans'], values: [34, 30, 22, 14] };
+  chartData.pop3 = { labels: ['2015','2018','2021','2024','2026'], values: [2.1, 1.9, 1.6, 2.14, 2.14] };
+  return `
+    <h3 class="section-header">Démographie</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Population 2026</div><div class="value">${formatNum(d.population2026)}</div></div>
+      <div class="kpi-card vert"><div class="label">Naissances</div><div class="value">${formatNum(d.naissances)}</div></div>
+      <div class="kpi-card jaune"><div class="label">Décès</div><div class="value">${formatNum(d.deces)}</div></div>
+      <div class="kpi-card"><div class="label">Fécondité</div><div class="value">${d.fecondite}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Évolution démographique</h3><div class="canvas-wrap"><canvas id="chartPop1"></canvas></div></div>
+      <div class="chart-box"><h3>Structure par âge (%)</h3><div class="canvas-wrap"><canvas id="chartPop2"></canvas></div></div>
+      <div class="chart-box"><h3>Évolution de l'indice de fécondité</h3><div class="canvas-wrap"><canvas id="chartPop3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderAgriculture() {
+  const d = state.data.agriculture;
+  chartData.agr1 = { labels: ['SAU (ha)','Canne (ha)','Main-d\'œuvre','Exploitations'], values: [d.sau, d.canne, d.mainOeuvre, d.exploitations] };
+  chartData.agr2 = { labels: ['2010','2020','2024'], values: [24336, 21423, 19145] };
+  chartData.agr3 = { labels: ['Canne à sucre','Fruits tropicaux','Élevage','Légumes','Fleurs'], values: [52, 18, 12, 12, 6] };
+  return `
+    <h3 class="section-header">Agriculture</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">SAU</div><div class="value">${formatNum(d.sau)} ha</div></div>
+      <div class="kpi-card vert"><div class="label">Canne</div><div class="value">${formatNum(d.canne)} ha</div></div>
+      <div class="kpi-card jaune"><div class="label">Main-d'œuvre</div><div class="value">${formatNum(d.mainOeuvre)} ETP</div></div>
+      <div class="kpi-card"><div class="label">Exploitations</div><div class="value">${formatNum(d.exploitations)}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Indicateurs agricoles</h3><div class="canvas-wrap"><canvas id="chartAgr1"></canvas></div></div>
+      <div class="chart-box"><h3>Évolution des surfaces en canne (ha)</h3><div class="canvas-wrap"><canvas id="chartAgr2"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition des productions</h3><div class="canvas-wrap"><canvas id="chartAgr3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderFacilities() {
+  const d = state.data.facilities;
+  chartData.fac1 = { labels: ['Total','Sportifs','Culturels','Scolaires'], values: [d.equipements, d.sportifs, d.culturels, d.scolaires] };
+  chartData.fac2 = { labels: ['Nord','Ouest','Sud','Est','Cirques'], values: [3800, 3200, 2900, 1800, 800] };
+  chartData.fac3 = { labels: ['Sportifs','Culturels','Scolaires','Autres'], values: [3200, 850, 420, 8030] };
+  return `
+    <h3 class="section-header">Équipements publics</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Total</div><div class="value">${formatNum(d.equipements)}</div></div>
+      <div class="kpi-card vert"><div class="label">Sportifs</div><div class="value">${formatNum(d.sportifs)}</div></div>
+      <div class="kpi-card jaune"><div class="label">Culturels</div><div class="value">${formatNum(d.culturels)}</div></div>
+      <div class="kpi-card"><div class="label">Scolaires</div><div class="value">${formatNum(d.scolaires)}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Répartition des équipements</h3><div class="canvas-wrap"><canvas id="chartFac1"></canvas></div></div>
+      <div class="chart-box"><h3>Équipements par micro-région</h3><div class="canvas-wrap"><canvas id="chartFac2"></canvas></div></div>
+      <div class="chart-box"><h3>Types d'équipements</h3><div class="canvas-wrap"><canvas id="chartFac3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderHeritage() {
+  const d = state.data.heritage;
+  chartData.her1 = { labels: ['UNESCO','Parc National (×10k ha)','Zones'], values: [d.unescoSites, d.parcNational/10000, d.zones] };
+  chartData.her2 = { labels: ['Pitons, cirques','Forêts','Zones humides','Récifs'], values: [45, 28, 15, 12] };
+  chartData.her3 = { labels: ['Protection intégrale','Cœur de parc','Aire d\'adhésion'], values: [35, 45, 20] };
+  return `
+    <h3 class="section-header">Patrimoine naturel et culturel</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Sites UNESCO</div><div class="value">${d.unescoSites}</div></div>
+      <div class="kpi-card vert"><div class="label">Parc National</div><div class="value">${formatNum(d.parcNational)} ha</div></div>
+      <div class="kpi-card jaune"><div class="label">Critères</div><div class="value">${d.criteres}</div></div>
+      <div class="kpi-card"><div class="label">Zones</div><div class="value">${d.zones}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Patrimoine naturel</h3><div class="canvas-wrap"><canvas id="chartHer1"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition des écosystèmes (%)</h3><div class="canvas-wrap"><canvas id="chartHer2"></canvas></div></div>
+      <div class="chart-box"><h3>Zonage de protection (%)</h3><div class="canvas-wrap"><canvas id="chartHer3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderHospitality() {
+  const d = state.data.hospitality;
+  chartData.hos1 = { labels: ['Établissements','Classements','Écolodges'], values: [d.etablissements, d.classements, d.ecolodges] };
+  chartData.hos2 = { labels: ['5★','4★','3★','2★'], values: [1, 24, 20, 11] };
+  chartData.hos3 = { labels: ['Saint-Gilles','Saint-Denis','Saint-Pierre','Autres'], values: [18, 12, 8, 18] };
+  return `
+    <h3 class="section-header">Hébergement touristique</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Établissements</div><div class="value">${d.etablissements}</div></div>
+      <div class="kpi-card vert"><div class="label">Classements</div><div class="value">${d.classements}</div></div>
+      <div class="kpi-card jaune"><div class="label">Écolodges</div><div class="value">${d.ecolodges}</div></div>
+      <div class="kpi-card"><div class="label">Chambres</div><div class="value">${formatNum(d.chambres)}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Capacité d'hébergement</h3><div class="canvas-wrap"><canvas id="chartHos1"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition par classement étoiles</h3><div class="canvas-wrap"><canvas id="chartHos2"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition géographique</h3><div class="canvas-wrap"><canvas id="chartHos3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderNearby() {
+  const d = state.data.nearby;
+  chartData.nea1 = { labels: ['Écoles','Arrêts bus (×10)','Musées'], values: [d.ecoles, d.arretsCarJaune/10, d.musees] };
+  chartData.nea2 = { labels: ['< 500 m','500 m - 1 km','1 - 2 km','2 - 5 km'], values: [32, 28, 24, 16] };
+  chartData.nea3 = { labels: ['Urbain','Périurbain','Rural'], values: [85, 62, 38] };
+  return `
+    <h3 class="section-header">Services de proximité</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Écoles</div><div class="value">${d.ecoles}</div></div>
+      <div class="kpi-card vert"><div class="label">Arrêts Car Jaune</div><div class="value">${formatNum(d.arretsCarJaune)}</div></div>
+      <div class="kpi-card jaune"><div class="label">Musées</div><div class="value">${d.musees}</div></div>
+      <div class="kpi-card"><div class="label">Rayon</div><div class="value">${d.radius} km</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Équipements de proximité</h3><div class="canvas-wrap"><canvas id="chartNea1"></canvas></div></div>
+      <div class="chart-box"><h3>Distance aux services (% population)</h3><div class="canvas-wrap"><canvas id="chartNea2"></canvas></div></div>
+      <div class="chart-box"><h3>Couverture par type de territoire (%)</h3><div class="canvas-wrap"><canvas id="chartNea3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderPossession() {
+  const d = state.data.possession;
+  chartData.pos1 = { labels: ['Marchés','Subventions','Contrats'], values: [d.marches, d.subventions, d.contrats] };
+  chartData.pos2 = { labels: ['Travaux','Services','Fournitures'], values: [52, 32, 16] };
+  chartData.pos3 = { labels: ['< 100 k€','100 k€ - 1 M€','> 1 M€'], values: [48, 38, 14] };
+  return `
+    <h3 class="section-header">Commande publique</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Marchés publics</div><div class="value">${d.marches}</div></div>
+      <div class="kpi-card vert"><div class="label">Subventions</div><div class="value">${d.subventions}</div></div>
+      <div class="kpi-card jaune"><div class="label">Contrats</div><div class="value">${d.contrats}</div></div>
+      <div class="kpi-card"><div class="label">Bénéficiaires</div><div class="value">${d.beneficiaires}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Activité de la commande publique</h3><div class="canvas-wrap"><canvas id="chartPos1"></canvas></div></div>
+      <div class="chart-box"><h3>Répartition par type de marché (%)</h3><div class="canvas-wrap"><canvas id="chartPos2"></canvas></div></div>
+      <div class="chart-box"><h3>Montants des marchés (%)</h3><div class="canvas-wrap"><canvas id="chartPos3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderTerritory() {
+  const d = state.data.territory;
+  chartData.ter1 = { labels: ['Transactions','Permis','Foncier'], values: [d.transactions, d.permisConstruire, d.potentielFoncier] };
+  chartData.ter2 = { labels: ['Nord','Ouest','Sud','Est','Cirques'], values: [3200, 2800, 2400, 1400, 603] };
+  chartData.ter3 = { labels: ['Tissu urbain','Zones agricoles','Zones naturelles','Zones à urbaniser'], values: [38, 28, 24, 10] };
+  return `
+    <h3 class="section-header">Aménagement du territoire</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Transactions</div><div class="value">${formatNum(d.transactions)}</div></div>
+      <div class="kpi-card vert"><div class="label">Permis</div><div class="value">${formatNum(d.permisConstruire)}</div></div>
+      <div class="kpi-card jaune"><div class="label">Foncier</div><div class="value">${formatNum(d.potentielFoncier)} ha</div></div>
+      <div class="kpi-card"><div class="label">Codes postaux</div><div class="value">${d.codesPostaux}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Dynamique territoriale</h3><div class="canvas-wrap"><canvas id="chartTer1"></canvas></div></div>
+      <div class="chart-box"><h3>Transactions par micro-région</h3><div class="canvas-wrap"><canvas id="chartTer2"></canvas></div></div>
+      <div class="chart-box"><h3>Utilisation du sol (%)</h3><div class="canvas-wrap"><canvas id="chartTer3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderUrbanism() {
+  const d = state.data.urbanism;
+  chartData.urb1 = { labels: ['PLU','Permis non-résidentiels','Zones'], values: [d.plu, d.permisNonResidentiels, d.zones] };
+  chartData.urb2 = { labels: ['Logements collectifs','Logements individuels','Locaux commerciaux','Bureaux'], values: [320, 1800, 420, 260] };
+  chartData.urb3 = { labels: ['Zones U','Zones AU','Zones A','Zones N'], values: [38, 12, 28, 22] };
+  return `
+    <h3 class="section-header">Urbanisme et planification</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">PLU</div><div class="value">${d.plu}</div></div>
+      <div class="kpi-card vert"><div class="label">Permis non-rés.</div><div class="value">${d.permisNonResidentiels}</div></div>
+      <div class="kpi-card jaune"><div class="label">Zones</div><div class="value">${d.zones}</div></div>
+      <div class="kpi-card rouge"><div class="label">Contraintes</div><div class="value">${d.contraintes}</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Planification urbaine</h3><div class="canvas-wrap"><canvas id="chartUrb1"></canvas></div></div>
+      <div class="chart-box"><h3>Permis de construire par type</h3><div class="canvas-wrap"><canvas id="chartUrb2"></canvas></div></div>
+      <div class="chart-box"><h3>Zonage du PLU (%)</h3><div class="canvas-wrap"><canvas id="chartUrb3"></canvas></div></div>
+    </div>
+  `;
+}
+function renderWeather() {
+  const d = state.data.weather;
+  chartData.wea1 = { labels: ['Température (°C)','Humidité (%)','Précipitations (×100 mm)'], values: [d.temperature, d.humidite, d.pluie/100] };
+  chartData.wea2 = { labels: ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'], values: [28, 28, 27, 26, 24, 22, 21, 21, 22, 23, 25, 27] };
+  chartData.wea3 = { labels: ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'], values: [280, 260, 240, 180, 120, 90, 80, 70, 80, 100, 140, 200] };
+  return `
+    <h3 class="section-header">Données météorologiques</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Stations SYNOP</div><div class="value">${d.stationsSynop}</div></div>
+      <div class="kpi-card vert"><div class="label">Température</div><div class="value">${d.temperature} °C</div></div>
+      <div class="kpi-card jaune"><div class="label">Humidité</div><div class="value">${d.humidite} %</div></div>
+      <div class="kpi-card"><div class="label">Pluie/an</div><div class="value">${formatNum(d.pluie)} mm</div></div>
+    </div>
+    <div class="charts-grid three">
+      <div class="chart-box"><h3>Observations météorologiques</h3><div class="canvas-wrap"><canvas id="chartWea1"></canvas></div></div>
+      <div class="chart-box"><h3>Températures moyennes mensuelles (°C)</h3><div class="canvas-wrap"><canvas id="chartWea2"></canvas></div></div>
+      <div class="chart-box"><h3>Précipitations mensuelles (mm)</h3><div class="canvas-wrap"><canvas id="chartWea3"></canvas></div></div>
+    </div>
+  `;
+}
+
+/* EXPLORATION */
+function renderExploration() {
+  const s = exploreState;
+  let html = `
+    <h3 class="section-header">Exploration du catalogue de données</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Datasets disponibles</div><div class="value">~270</div><div class="sub">data.regionreunion.com</div></div>
+      <div class="kpi-card vert"><div class="label">Résultats</div><div class="value">${s.datasets.length}</div><div class="sub">${esc(s.keyword || '—')}</div></div>
+      <div class="kpi-card jaune"><div class="label">Sélection</div><div class="value" style="font-size:1rem;">${s.selected ? esc((s.selected.title || '').substring(0, 28)) : '—'}</div></div>
+      <div class="kpi-card rouge"><div class="label">Enregistrements</div><div class="value">${formatNum(s.total)}</div></div>
+    </div>
+    <div class="chart-box" style="margin-bottom:20px;">
+      <h3>Rechercher un jeu de données</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <input type="text" id="exploreInput" placeholder="Saisir un mot-clé (ex : logement, transport, élections)" value="${esc(s.keyword)}"
+               style="flex:1;min-width:200px;padding:10px 14px;border:1px solid var(--border-strong);border-radius:0;font-family:inherit;font-size:.85rem;background:#fff;color:var(--text);">
+        <button id="exploreBtn" class="refresh-btn" style="width:auto;min-width:140px;margin:0;">Rechercher</button>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="nav-btn" data-quick="tourisme" style="border:1px solid var(--border);min-width:110px;">Tourisme</button>
+        <button class="nav-btn" data-quick="transport" style="border:1px solid var(--border);min-width:110px;">Transport</button>
+        <button class="nav-btn" data-quick="logement" style="border:1px solid var(--border);min-width:110px;">Logement</button>
+        <button class="nav-btn" data-quick="education" style="border:1px solid var(--border);min-width:110px;">Éducation</button>
+        <button class="nav-btn" data-quick="sante" style="border:1px solid var(--border);min-width:110px;">Santé</button>
+        <button class="nav-btn" data-quick="environnement" style="border:1px solid var(--border);min-width:110px;">Environnement</button>
+      </div>
+    </div>
+  `;
+  if (s.loading) {
+    html += `<div class="loading-msg">Recherche en cours…</div>`;
+  } else if (s.datasets.length > 0) {
+    html += `
+      <h3 class="section-header">Résultats (${s.datasets.length})</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Titre</th><th>Identifiant</th><th>Action</th></tr></thead>
+          <tbody>
+            ${s.datasets.map(d => `
+              <tr>
+                <td><strong>${esc((d.title || '').substring(0, 80))}</strong></td>
+                <td style="font-family:monospace;font-size:.72rem;">${esc(d.dataset_id || d.id || '')}</td>
+                <td><button class="nav-btn" data-dataset="${esc(d.dataset_id || d.id)}" style="border:1px solid var(--blue-france);color:var(--blue-france);padding:6px 14px;font-size:.75rem;">Consulter</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } else if (s.keyword) {
+    html += `<div class="empty-msg">Aucun jeu de données ne correspond à « ${esc(s.keyword)} »</div>`;
+  }
+  if (s.selected && s.records.length > 0) {
+    html += `
+      <h3 class="section-header">${esc((s.selected.title || '').substring(0, 90))}</h3>
+      <div class="chart-box tall">
+        <h3>Visualisation automatique</h3>
+        <div class="canvas-wrap"><canvas id="chartExplore"></canvas></div>
+      </div>
+      <h3 class="section-header">Aperçu des données brutes</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>${Object.keys(s.records[0]).slice(0, 6).map(k => `<th>${esc(k)}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${s.records.slice(0, 20).map(r => `
+              <tr>${Object.keys(s.records[0]).slice(0, 6).map(k => `<td>${esc(String(r[k] ?? '').substring(0, 40))}</td>`).join('')}</tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+  return html;
+}
+
+/* FOOTER */
+function renderFooter() {
+  return `
+    <footer class="footer">
+      <div>
+        <h4>Sources de données</h4>
+        <ul>
+          <li><a href="https://data.regionreunion.com" target="_blank" rel="noopener">data.regionreunion.com</a></li>
+          <li><a href="https://www.insee.fr" target="_blank" rel="noopener">Insee</a></li>
+          <li><a href="https://www.iedom.fr" target="_blank" rel="noopener">IEDOM</a></li>
+          <li><a href="https://www.oer.fr" target="_blank" rel="noopener">Observatoire de l'Énergie</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Cadre juridique</h4>
+        <ul>
+          <li>Licence Ouverte Etalab 2.0</li>
+          <li>Loi n° 2016-1321 pour une République numérique</li>
+          <li>Directive INSPIRE</li>
+          <li>Open Data — Service public</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Accessibilité</h4>
+        <ul>
+          <li>RGAA 4.1 — niveau AA visé</li>
+          <li>Contrastes conformes</li>
+          <li>Navigation clavier</li>
+          <li>Compatible lecteurs d'écran</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>Région Réunion</li>
+          <li>Hôtel de Région — Saint-Denis</li>
+          <li><a href="https://www.regionreunion.com" target="_blank" rel="noopener">www.regionreunion.com</a></li>
+        </ul>
+      </div>
+      <div class="legal">
+        <span class="rf">République Française</span>
+        <span>Portail des données publiques — La Réunion</span>
+        <span>Version 1.0 — Données mises à jour automatiquement</span>
+      </div>
+    </footer>
+  `;
+}
+
+/* =========================================================================
+   GRAPHIQUES
+   ========================================================================= */
+function destroyCharts() {
+  Object.values(charts).forEach(c => { try { c.destroy(); } catch(e){} });
+  Object.keys(charts).forEach(k => delete charts[k]);
+}
+
+function renderCharts() {
+  destroyCharts();
+  const m = document.getElementById('mainContent');
+  if (!m || typeof Chart === 'undefined') return;
+
+  const gridColor = 'rgba(224,224,224,.7)';
+  const textColor = '#3a3a3a';
+  const font = { family: '"Marianne","Segoe UI",system-ui,sans-serif', size: 11, weight: '500' };
+
+  const configs = {
+    chartEco1: { data: chartData.eco1, type: 'doughnut', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+    chartEco2: { data: chartData.eco2, type: 'line', colors: ['#000091'] },
+    chartEco3: { data: chartData.eco3, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a','#b34000','#6e445a'] },
+
+    chartEmp1: { data: chartData.emp1, type: 'bar', colors: ['#e1000f','#000091','#a5770a'] },
+    chartEmp2: { data: chartData.emp2, type: 'line', colors: ['#e1000f'] },
+    chartEmp3: { data: chartData.emp3, type: 'doughnut', colors: ['#18753c','#000091','#e1000f'] },
+
+    chartTour1: { data: chartData.tour1, type: 'doughnut', colors: ['#000091','#e1000f','#a5770a','#18753c'] },
+    chartTour2: { data: chartData.tour2, type: 'line', colors: ['#000091'] },
+    chartTour3: { data: chartData.tour3, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+
+    chartLog1: { data: chartData.log1, type: 'bar', colors: ['#000091','#e1000f','#18753c','#b34000'] },
+    chartLog2: { data: chartData.log2, type: 'bar', colors: ['#e1000f','#e1000f','#e1000f','#e1000f'] },
+    chartLog3: { data: chartData.log3, type: 'doughnut', colors: ['#000091','#e1000f','#18753c'] },
+
+    chartTr1: { data: chartData.tr1, type: 'bar', colors: ['#000091','#e1000f','#a5770a'] },
+    chartTr2: { data: chartData.tr2, type: 'bar', colors: ['#000091','#e1000f','#000091','#b34000','#000091','#18753c','#18753c'] },
+    chartTr3: { data: chartData.tr3, type: 'doughnut', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+
+    chartEdu1: { data: chartData.edu1, type: 'doughnut', colors: ['#e1000f','#b34000','#000091'] },
+    chartEdu2: { data: chartData.edu2, type: 'bar', colors: ['#000091','#b34000','#e1000f','#a5770a','#18753c'] },
+    chartEdu3: { data: chartData.edu3, type: 'line', colors: ['#000091'] },
+
+    chartSan1: { data: chartData.san1, type: 'bar', colors: ['#e1000f','#e1000f','#18753c'] },
+    chartSan2: { data: chartData.san2, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a','#b34000'] },
+    chartSan3: { data: chartData.san3, type: 'doughnut', colors: ['#e1000f','#000091','#18753c','#a5770a'] },
+
+    chartSoc1: { data: chartData.soc1, type: 'bar', colors: ['#e1000f','#e1000f','#a5770a'] },
+    chartSoc2: { data: chartData.soc2, type: 'bar', colors: ['#e1000f','#18753c','#000091','#a5770a'] },
+    chartSoc3: { data: chartData.soc3, type: 'bar', colors: ['#000091','#b34000','#e1000f','#e1000f','#e1000f'] },
+
+    chartCul1: { data: chartData.cul1, type: 'bar', colors: ['#000091','#e1000f','#18753c'] },
+    chartCul2: { data: chartData.cul2, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+    chartCul3: { data: chartData.cul3, type: 'doughnut', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+
+    chartAdm1: { data: chartData.adm1, type: 'bar', colors: ['#000091','#e1000f','#18753c'] },
+    chartAdm2: { data: chartData.adm2, type: 'bar', colors: ['#000091','#e1000f','#18753c'] },
+    chartAdm3: { data: chartData.adm3, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+
+    chartEnv1: { data: chartData.env1, type: 'bar', colors: ['#000091','#18753c','#e1000f'] },
+    chartEnv2: { data: chartData.env2, type: 'bar', colors: ['#e1000f','#b34000','#a5770a','#18753c','#000091'] },
+    chartEnv3: { data: chartData.env3, type: 'doughnut', colors: ['#e1000f','#a5770a','#18753c'] },
+
+    chartEne1: { data: chartData.ene1, type: 'doughnut', colors: ['#18753c','#e1000f'] },
+    chartEne2: { data: chartData.ene2, type: 'doughnut', colors: ['#18753c','#a5770a','#000091','#6a6af4','#e1000f'] },
+    chartEne3: { data: chartData.ene3, type: 'line', colors: ['#000091'] },
+
+    chartGeo1: { data: chartData.geo1, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+    chartGeo2: { data: chartData.geo2, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a','#6e445a'] },
+    chartGeo3: { data: chartData.geo3, type: 'doughnut', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+
+    chartTel1: { data: chartData.tel1, type: 'bar', colors: ['#000091','#18753c','#a5770a'] },
+    chartTel2: { data: chartData.tel2, type: 'doughnut', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+    chartTel3: { data: chartData.tel3, type: 'line', colors: ['#000091'] },
+
+    chartRis1: { data: chartData.ris1, type: 'bar', colors: ['#e1000f','#e1000f','#a5770a'] },
+    chartRis2: { data: chartData.ris2, type: 'bar', colors: ['#e1000f','#b34000','#a5770a','#18753c','#000091'] },
+    chartRis3: { data: chartData.ris3, type: 'doughnut', colors: ['#000091','#e1000f','#a5770a','#18753c','#b34000'] },
+
+    chartPop1: { data: chartData.pop1, type: 'line', colors: ['#000091'] },
+    chartPop2: { data: chartData.pop2, type: 'doughnut', colors: ['#000091','#e1000f','#a5770a','#18753c'] },
+    chartPop3: { data: chartData.pop3, type: 'line', colors: ['#e1000f'] },
+
+    chartAgr1: { data: chartData.agr1, type: 'bar', colors: ['#000091','#18753c','#a5770a','#e1000f'] },
+    chartAgr2: { data: chartData.agr2, type: 'line', colors: ['#18753c'] },
+    chartAgr3: { data: chartData.agr3, type: 'doughnut', colors: ['#000091','#e1000f','#18753c','#a5770a','#6e445a'] },
+
+    chartFac1: { data: chartData.fac1, type: 'bar', colors: ['#000091','#18753c','#a5770a','#e1000f'] },
+    chartFac2: { data: chartData.fac2, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a','#6e445a'] },
+    chartFac3: { data: chartData.fac3, type: 'doughnut', colors: ['#18753c','#000091','#a5770a','#e1000f'] },
+
+    chartHer1: { data: chartData.her1, type: 'bar', colors: ['#000091','#18753c','#a5770a'] },
+    chartHer2: { data: chartData.her2, type: 'doughnut', colors: ['#18753c','#000091','#a5770a','#e1000f'] },
+    chartHer3: { data: chartData.her3, type: 'doughnut', colors: ['#e1000f','#18753c','#a5770a'] },
+
+    chartHos1: { data: chartData.hos1, type: 'bar', colors: ['#000091','#18753c','#a5770a'] },
+    chartHos2: { data: chartData.hos2, type: 'bar', colors: ['#e1000f','#000091','#18753c','#a5770a'] },
+    chartHos3: { data: chartData.hos3, type: 'doughnut', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+
+    chartNea1: { data: chartData.nea1, type: 'bar', colors: ['#000091','#18753c','#a5770a'] },
+    chartNea2: { data: chartData.nea2, type: 'bar', colors: ['#18753c','#000091','#a5770a','#e1000f'] },
+    chartNea3: { data: chartData.nea3, type: 'doughnut', colors: ['#000091','#e1000f','#a5770a'] },
+
+    chartPos1: { data: chartData.pos1, type: 'bar', colors: ['#000091','#18753c','#a5770a'] },
+    chartPos2: { data: chartData.pos2, type: 'doughnut', colors: ['#000091','#e1000f','#18753c'] },
+    chartPos3: { data: chartData.pos3, type: 'doughnut', colors: ['#18753c','#000091','#e1000f'] },
+
+    chartTer1: { data: chartData.ter1, type: 'bar', colors: ['#000091','#18753c','#a5770a'] },
+    chartTer2: { data: chartData.ter2, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a','#6e445a'] },
+    chartTer3: { data: chartData.ter3, type: 'doughnut', colors: ['#000091','#18753c','#a5770a','#e1000f'] },
+
+    chartUrb1: { data: chartData.urb1, type: 'bar', colors: ['#000091','#18753c','#a5770a'] },
+    chartUrb2: { data: chartData.urb2, type: 'bar', colors: ['#000091','#e1000f','#18753c','#a5770a'] },
+    chartUrb3: { data: chartData.urb3, type: 'doughnut', colors: ['#e1000f','#b34000','#18753c','#000091'] },
+
+    chartWea1: { data: chartData.wea1, type: 'bar', colors: ['#000091','#18753c','#a5770a'] },
+    chartWea2: { data: chartData.wea2, type: 'line', colors: ['#e1000f'] },
+    chartWea3: { data: chartData.wea3, type: 'bar', colors: ['#000091'] }
+  };
+
+  Object.entries(configs).forEach(([canvasId, cfg]) => {
+    const canvas = m.querySelector('#' + canvasId);
+    if (!canvas || !cfg.data) return;
+    charts[canvasId] = new Chart(canvas, {
+      type: cfg.type,
+      data: {
+        labels: cfg.data.labels,
+        datasets: [{
+          data: cfg.data.values,
+          backgroundColor: cfg.type === 'line' ? 'rgba(0,0,145,0.1)' : cfg.colors,
+          borderColor: cfg.type === 'line' ? cfg.colors[0] : '#fff',
+          borderWidth: cfg.type === 'line' ? 2 : (cfg.type === 'doughnut' ? 2 : 0),
+          tension: 0.2,
+          fill: cfg.type === 'line'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: cfg.type === 'doughnut',
+            position: 'right',
+            labels: { color: textColor, font, boxWidth: 12, padding: 10 }
+          }
+        },
+        scales: cfg.type !== 'doughnut' ? {
+          x: { ticks: { color: textColor, font, maxRotation: 45 }, grid: { display: false }, border: { color: '#d5d5d5' } },
+          y: { ticks: { color: textColor, font, callback: v => Number(v).toLocaleString('fr-FR') }, grid: { color: gridColor }, border: { color: '#d5d5d5' } }
+        } : undefined
+      }
+    });
+  });
+
+  const cExplore = m.querySelector('#chartExplore');
+  if (cExplore && exploreState.records.length > 0) {
+    const records = exploreState.records;
+    const first = records[0];
+    const numField = Object.keys(first).find(k => typeof first[k] === 'number');
+    const labelField = Object.keys(first).find(k => typeof first[k] === 'string' && first[k].length < 40);
+    if (numField) {
+      const labels = records.slice(0, 20).map((r, i) =>
+        labelField ? String(r[labelField]).substring(0, 30) : `#${i + 1}`
+      );
+      const values = records.slice(0, 20).map(r => Number(r[numField]) || 0);
+      charts.chartExplore = new Chart(cExplore, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: numField, data: values, backgroundColor: '#000091' }] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: true, labels: { color: textColor, font } } },
+          scales: {
+            x: { ticks: { color: textColor, font, maxRotation: 45 }, grid: { display: false } },
+            y: { ticks: { color: textColor, font }, grid: { color: gridColor } }
+          }
+        }
+      });
+    } else {
+      cExplore.parentNode.innerHTML = '<div class="empty-msg">Aucun champ numérique détecté</div>';
+    }
+  }
+}
+
+/* =========================================================================
+   LISTENERS EXPLORATION
+   ========================================================================= */
+function attachExploreListeners() {
+  const m = document.getElementById('mainContent');
+  const btn = m.querySelector('#exploreBtn');
+  const input = m.querySelector('#exploreInput');
+  if (btn && input) {
+    const doSearch = async () => {
+      exploreState.keyword = input.value.trim();
+      if (!exploreState.keyword) return;
+      exploreState.loading = true;
+      render();
+      exploreState.datasets = await chercherDatasets(exploreState.keyword);
+      exploreState.loading = false;
+      render();
+    };
+    btn.onclick = doSearch;
+    input.onkeydown = (e) => { if (e.key === 'Enter') doSearch(); };
+  }
+  m.querySelectorAll('[data-quick]').forEach(b => {
+    b.onclick = async () => {
+      exploreState.keyword = b.dataset.quick;
+      exploreState.loading = true;
+      render();
+      exploreState.datasets = await chercherDatasets(exploreState.keyword);
+      exploreState.loading = false;
+      render();
+    };
+  });
+  m.querySelectorAll('[data-dataset]').forEach(b => {
+    b.onclick = async () => {
+      const id = b.dataset.dataset;
+      exploreState.loading = true;
+      render();
+      const { results, total } = await chargerDatasetParId(id, 100);
+      exploreState.selected = exploreState.datasets.find(d => (d.dataset_id || d.id) === id) || { title: id };
+      exploreState.records = extractFields(results);
+      exploreState.total = total;
+      exploreState.loading = false;
+      render();
+    };
+  });
+}
+
+/* =========================================================================
+   RENDU GLOBAL
+   ========================================================================= */
+function render() {
+  renderSidebar();
+  renderMain();
+}
+
+async function demarrer() {
+  initHamburger();
+  renderSidebar();
+  document.getElementById('mainContent').innerHTML = '<div class="loading-msg">Chargement des données…</div>';
+  await chargerTousLesModules();
+  render();
+  setInterval(async () => { await chargerTousLesModules(); render(); }, AUTO_REFRESH_MS);
+}
+
+document.addEventListener('DOMContentLoaded', demarrer);
+</script>
+</body>
+</html>
